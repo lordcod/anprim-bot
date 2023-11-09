@@ -44,7 +44,6 @@ class ConfirmModal(nextcord.ui.Modal):
         channel = self.bot.get_channel(channel_suggest_accept)
         embed_accept = nextcord.Embed(
             title="Идея одобрена!",
-            description=f'### Идея от {embed.author.name}\n',
             color=nextcord.Color.green()
         )
         embed_accept.add_field(name='Суть идеи:',value=embed.fields[0].value,inline=False)
