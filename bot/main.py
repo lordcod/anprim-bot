@@ -4,7 +4,7 @@ from bot.views.view import (Confirm,IdeaBut)
 from bot.misc.env import token
 
 
-bot = commands.Bot(command_prefix='a.',intents=nextcord.Intents.all(),default_guild_ids=[1160838343421075476])
+bot = commands.Bot(command_prefix='a.',intents=nextcord.Intents.all())
 
 
 

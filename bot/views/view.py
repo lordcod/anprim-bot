@@ -31,27 +31,34 @@ class ConfirmModal(nextcord.ui.Modal):
         embed = interaction.message.embeds[0]
         embed.color = nextcord.Color.green()
         embed.set_footer(text=f'Одобрено | {name}',icon_url=interaction.user.display_avatar)
-        await interaction.message.edit(embed=embed)
+        ping = interaction.message.content
+        content = f'{ping} твоя идея одобрена!'
+        
+        views = Confirm(self.bot)
+        views.confirm.disabled = True
+        views.cancel.disabled = True
+        
+        await interaction.message.edit(content=content,embed=embed,view=views)
         
         
         channel = self.bot.get_channel(channel_suggest_accept)
         embed_accept = nextcord.Embed(
             title="Идея одобрена!",
             description=f'### Идея от {embed.author.name}\n',
-            color=nextcord.Color.blurple()
+            color=nextcord.Color.green()
         )
         embed_accept.add_field(name='Суть идеи:',value=embed.fields[0].value,inline=False)
         if val:
             embed_accept.add_field(name='Аргумент подтверждения:',value=val,inline=False)
         embed_accept.set_footer(text=name,icon_url=interaction.user.display_avatar)
-        await channel.send(embed=embed_accept)
+        await channel.send(content=content,embed=embed_accept)
 
 class Confirm(nextcord.ui.View):
     def __init__(self,bot):
         super().__init__(timeout=None)
         self.bot = bot
     
-    @nextcord.ui.button(label="Confirm", style=nextcord.ButtonStyle.green,custom_id='persistent_view:confirm')
+    @nextcord.ui.button(label="Одобрить", style=nextcord.ButtonStyle.green,custom_id='persistent_view:confirm')
     async def confirm(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
         role_ids = [role.id for role in interaction.user.roles] 
         for ar in accept_roles:
@@ -61,7 +68,7 @@ class Confirm(nextcord.ui.View):
             return
         await interaction.response.send_modal(ConfirmModal(self.bot,interaction))
     
-    @nextcord.ui.button(label="Cancel", style=nextcord.ButtonStyle.grey,custom_id='persistent_view:cancel')
+    @nextcord.ui.button(label="Отказать", style=nextcord.ButtonStyle.red,custom_id='persistent_view:cancel')
     async def cancel(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
         role_ids = [role.id for role in interaction.user.roles] 
         for ar in accept_roles:
@@ -73,7 +80,14 @@ class Confirm(nextcord.ui.View):
         embed = interaction.message.embeds[0]
         embed.color = nextcord.Color.red()
         embed.set_footer(text=f'Отказано | {name}',icon_url=interaction.user.display_avatar)
-        await interaction.message.edit(embed=embed)
+        
+        ping = interaction.message.content
+        content = f'{ping} твоей идеи отказано!'
+        
+        self.confirm.disabled = True
+        self.cancel.disabled = True
+        
+        await interaction.message.edit(content=content,embed=embed,view=self)
 
 class IdeaModal(nextcord.ui.Modal):
     def __init__(self,bot):
@@ -109,7 +123,7 @@ class IdeaModal(nextcord.ui.Modal):
         )
         embed.add_field(name='Идея:',value=idea)
         
-        mes = await channel.send(embed=embed,view=Confirm(self.bot))
+        mes = await channel.send(content=interaction.user.mention,embed=embed,view=Confirm(self.bot))
         await mes.add_reaction("<a:tickmark:1170029771040759969>")
         await mes.add_reaction("<a:cross:1170029921314279544>")
         await mes.create_thread(name=f"Обсуждение идеи от {name}")
@@ -124,7 +138,7 @@ class IdeaBut(nextcord.ui.View):
     @nextcord.ui.button(
         label="Предложить идею",
         style=nextcord.ButtonStyle.green,
-        custom_id="persistent_view:sugg"
+        custom_id="persistent_view:sug"
     )
     async def suggest(
         self,
