@@ -5,11 +5,52 @@ from bot.misc.env import (channel_suggest,channel_suggest_accept,accept_roles)
 
 timeout = TableDict(0)
 
+class ConfirmModal(nextcord.ui.Modal):
+    def __init__(self,bot,interaction):
+        super().__init__(
+            "Предложить идею",
+            timeout=5 * 60,  # 5 minutes
+        )
+        self.bot = bot
+        self.interaction = interaction
+
+        self.idea = nextcord.ui.TextInput(
+            label="Аргумент:",
+            required=False,
+            style=nextcord.TextInputStyle.paragraph,
+            min_length=0,
+            max_length=1500,
+        )
+        self.add_item(self.idea)
+
+    async def callback(self, inter: nextcord.Interaction) -> None:
+        interaction = self.interaction
+        name = interaction.user.nick or interaction.user.global_name or interaction.user.name
+        val = self.idea.value
+        
+        embed = interaction.message.embeds[0]
+        embed.color = nextcord.Color.green()
+        embed.set_footer(text=f'Одобрено | {name}',icon_url=interaction.user.display_avatar)
+        await interaction.message.edit(embed=embed)
+        
+        
+        channel = self.bot.get_channel(channel_suggest_accept)
+        embed_accept = nextcord.Embed(
+            title="Идея одобрена!",
+            description=f'### Идея от {embed.author.name}\n',
+            color=nextcord.Color.blurple()
+        )
+        embed_accept.add_field(name='Суть идеи:',value=embed.fields[0].value,inline=False)
+        if val:
+            embed_accept.add_field(name='Аргумент подтверждения:',value=val,inline=False)
+        embed_accept.set_footer(text=name,icon_url=interaction.user.display_avatar)
+        await channel.send(embed=embed_accept)
+
 class Confirm(nextcord.ui.View):
     def __init__(self,bot):
         super().__init__(timeout=None)
         self.bot = bot
-
+    
     @nextcord.ui.button(label="Confirm", style=nextcord.ButtonStyle.green,custom_id='persistent_view:confirm')
     async def confirm(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
         role_ids = [role.id for role in interaction.user.roles] 
@@ -18,8 +59,8 @@ class Confirm(nextcord.ui.View):
                 break
         else:  
             return
-        await interaction.response.send_message("Confirming", ephemeral=True)
-
+        await interaction.response.send_modal(ConfirmModal(self.bot,interaction))
+    
     @nextcord.ui.button(label="Cancel", style=nextcord.ButtonStyle.grey,custom_id='persistent_view:cancel')
     async def cancel(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
         role_ids = [role.id for role in interaction.user.roles] 
@@ -28,9 +69,10 @@ class Confirm(nextcord.ui.View):
                 break
         else:  
             return
+        name = interaction.user.nick or interaction.user.global_name or interaction.user.name
         embed = interaction.message.embeds[0]
         embed.color = nextcord.Color.red()
-        embed.set_footer(text='Отказано',icon_url=interaction.user.display_avatar)
+        embed.set_footer(text=f'Отказано | {name}',icon_url=interaction.user.display_avatar)
         await interaction.message.edit(embed=embed)
 
 class IdeaModal(nextcord.ui.Modal):
