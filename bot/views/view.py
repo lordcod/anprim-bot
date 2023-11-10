@@ -1,9 +1,11 @@
 import nextcord
 import time
-from bot.misc.utils import TableDict
+from bot.misc.utils import TableDict,alphabet
 from bot.misc.env import (channel_suggest,channel_suggest_accept,accept_roles)
+from bot import db
 
 timeout = TableDict(0)
+
 
 class ConfirmModal(nextcord.ui.Modal):
     def __init__(self,bot,interaction):
@@ -153,4 +155,56 @@ class IdeaBut(nextcord.ui.View):
             )
             return
         await interaction.response.send_modal(modal=IdeaModal(self.bot))
+
+class CreatePoll(nextcord.ui.Modal):
+    def __init__(self) -> None:
+        super().__init__("Create pool", timeout=300)
+        
+        self.question = nextcord.ui.TextInput(
+            label='Question',
+            placeholder='Write a question',
+            max_length=100
+        )
+        self.choices = nextcord.ui.TextInput(
+            label='Choices',
+            placeholder='Write the options of choice through the line each',
+            style=nextcord.TextInputStyle.paragraph
+        )
+        self.description = nextcord.ui.TextInput(
+            label='Description',
+            style=nextcord.TextInputStyle.paragraph,
+            required=False
+        )
+        
+        self.add_item(self.question)
+        self.add_item(self.choices)
+        self.add_item(self.description)
+    
+    
+    async def callback(self, interaction: nextcord.Interaction):
+        question = self.question.value
+        choices = self.choices.value
+        description = self.description.value
+        
+        final_discr = ""
+        alp_ch = []
+        
+        for choice in choices.split('\n'):
+            final_discr = f'{final_discr}{alphabet[len(alp_ch)]} - {choice}\n'
+            alp_ch.append(alphabet[len(alp_ch)])
+        
+        
+        embed = nextcord.Embed(
+            title=question,
+            description=final_discr,
+            color=0xffba08
+        )
+        if description:
+            embed.add_field(name='Описание',value=description)
+        key = db.set(interaction.user.id)
+        embed.set_footer(text=key)
+        message = await interaction.channel.send(embed=embed)
+        for ch in alp_ch:
+            await message.add_reaction(ch)
+
 
