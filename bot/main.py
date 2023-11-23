@@ -5,7 +5,6 @@ from bot.misc.env import token
 from bot import db
 
 
-poll_db = {}
 
 bot = commands.Bot(command_prefix='a.',intents=nextcord.Intents.all())
 
@@ -38,8 +37,8 @@ async def poll(interaction: nextcord.Interaction):
 async def finish_poll(interaction: nextcord.Interaction, message: nextcord.Message):
     if not message.author == bot.user:
         return 
-    key = message.embeds[0].footer.text
-    user_id = db.get(key)
+        
+    user_id = db.get(message.id)
     if not interaction.user.id == user_id:
         await interaction.response.send_message('Это не ваш опрос',ephemeral=True)
         return

@@ -201,9 +201,9 @@ class CreatePoll(nextcord.ui.Modal):
         )
         if description:
             embed.add_field(name='Описание',value=description)
-        key = db.set(interaction.user.id)
-        embed.set_footer(text=key)
+        
         message = await interaction.channel.send(embed=embed)
+        db.set(message.id,interaction.user.id)
         for ch in alp_ch:
             await message.add_reaction(ch)
 
