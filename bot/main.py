@@ -17,6 +17,13 @@ async def on_ready():
     bot.add_view(IdeaBut(bot))
     print(f"The bot is registered as {bot.user}")
 
+@bot.event
+async def on_message(message: nextcord.Message):
+    if message.author.bot:
+        return
+    
+    if message.channel.id == 1169329230195196014:
+        await message.delete()
 
 @bot.command()
 async def button_suggest(ctx:commands.Context):
