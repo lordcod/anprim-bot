@@ -3,10 +3,13 @@ from nextcord.ext import commands,application_checks
 from bot.views.view import (Confirm,IdeaBut,CreatePoll)
 from bot.misc.env import token
 from bot import db
+import os
 
-loc = False
-
-bot = commands.Bot(command_prefix='a.',intents=nextcord.Intents.all())
+bot = commands.Bot(
+    command_prefix='a.',
+    intents=nextcord.Intents.all(),
+    default_guild_ids=[1179069504186232852]
+)
 
 
 
@@ -23,6 +26,8 @@ async def on_message(message: nextcord.Message):
     
     if message.channel.id == 1169329230195196014:
         await message.delete()
+    
+    await bot.process_commands(message)
 
 @bot.command()
 async def button_suggest(ctx:commands.Context):
@@ -35,11 +40,13 @@ async def poll(interaction: nextcord.Interaction):
 
 @bot.message_command("Finish Poll")
 async def finish_poll(interaction: nextcord.Interaction, message: nextcord.Message):
+    await interaction.response.pong()
+
     if not message.author == bot.user:
         return 
         
     user_id = db.get(message.id)
-    if not interaction.user.id == user_id:
+    if user_id and not interaction.user.id == user_id:
         await interaction.response.send_message('Это не ваш опрос',ephemeral=True)
         return
     general_count = sum([react.count for react in message.reactions])-len(message.reactions)
@@ -47,28 +54,12 @@ async def finish_poll(interaction: nextcord.Interaction, message: nextcord.Messa
     choices = []
     for desc in message.embeds[0].description.split("\n"):
         choices.append(desc)
-    integer = 0
     text = ''
-    for react in message.reactions:
+    for num, react in enumerate(message.reactions):
         count = react.count - 1
-        percent = int((count/general_count)*100)
-        text = f'{text}{choices[integer]} - **{percent}%**\n'
-        integer += 1
+        percent = count//general_count * 100
+        text = f'{text}{choices[num]} - **{percent}%**\n'
     await message.reply(text)
-    await interaction.response.defer(ephemeral=True)
-
-@bot.event
-async def on_reaction_add(reaction: nextcord.Reaction, user: nextcord.User):
-    if user.bot:
-        return
-    if not reaction.message.author.bot:
-        return
-    for react in reaction.message.reactions:
-        if react == reaction:
-            continue
-        async for umem in react.users():
-            if umem == user:
-                await react.remove(user)
 
 
 @bot.command()
@@ -77,7 +68,20 @@ async def shutdown(ctx:commands.Context):
     await bot.close()
 
 
+def load_dir(dirpath: str) -> None:
+    for filename in os.listdir(dirpath):
+        if os.path.isfile(f'{dirpath}/{filename}') and filename.endswith(".py") and not filename.startswith("__"):
+            fmp = filename[:-3]
+            supdirpath = dirpath[2:].split("/")
+            findirpatch = '.'.join(supdirpath)
+            
+            bot.load_extension(f"{findirpatch}.{fmp}")
+        elif os.path.isdir(f'{dirpath}/{filename}'):
+            load_dir(f'{dirpath}/{filename}')
+
 def start_bot():
+    load_dir("./bot/cogs")
+    
     bot.run(token)
 
 if __name__ == "__main__":
