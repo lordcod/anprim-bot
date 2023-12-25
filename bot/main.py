@@ -4,7 +4,7 @@ from bot.views.view import (Confirm,IdeaBut,CreatePoll)
 from bot.misc.env import token
 from bot import db
 
-
+loc = False
 
 bot = commands.Bot(command_prefix='a.',intents=nextcord.Intents.all())
 
