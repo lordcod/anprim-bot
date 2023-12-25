@@ -1,5 +1,16 @@
 from typing import Union
 
+alphabet = [
+    '🟨',
+    '🟩',
+    '🟪',
+    '🟫',
+    '🟥',
+    '🟦',
+    '🟧',
+    '⬜',
+    '⬛',
+]
 
 class TableDict:
     def __init__(
