@@ -2,4 +2,4 @@ import nextcord
 from nextcord.ext import commands
 
 class AnprimBot(commands.Bot):
-    message_history: dict = {}
+    message_history: list = []

@@ -21,11 +21,6 @@ class Moderation(commands.Cog):
     async def shutdown(self, ctx:commands.Context):
         await self.bot.close()
     
-    @commands.command()
-    async def infractions(self, ctx: commands.Context):
-        pass
-    
-    
 
 
 
