@@ -1,7 +1,6 @@
 import nextcord
 from nextcord.ext import commands
 from bot.views.view import (Confirm,IdeaBut)
-from bot.misc.anprimbot import AnprimBot
 from bot.misc.env import token
 
 import os
@@ -10,7 +9,7 @@ from datetime import datetime
 
 week = 60 * 60 * 24 * 7
 
-bot = AnprimBot(
+bot = commands.Bot(
     command_prefix='a.',
     intents=nextcord.Intents.all()
 )
