@@ -1,0 +1,28 @@
+import nextcord
+from nextcord.ext import commands
+
+from bot.views.view import IdeaBut
+
+class Moderation(commands.Cog):
+    bot: commands.Bot
+
+    def __init__(self, bot: commands.Bot) -> None:
+        self.bot = bot
+    
+    
+    @commands.command()
+    async def button_suggest(self, ctx:commands.Context):
+        await ctx.message.delete()
+        await ctx.send('Предложи свою идею для проекта!',view=IdeaBut(self.bot))
+
+    @commands.command()
+    @commands.is_owner()
+    async def shutdown(self, ctx:commands.Context):
+        await self.bot.close()
+
+
+
+def setup(bot: commands.Bot):
+    cog = Moderation(bot)
+
+    bot.add_cog(cog)

@@ -184,27 +184,29 @@ class CreatePoll(nextcord.ui.Modal):
     async def callback(self, interaction: nextcord.Interaction):
         question = self.question.value
         choices = self.choices.value
-        description = self.description.value
+        sketch = self.description.value
         
-        final_discr = ""
-        alp_ch = []
+        description = ""
         
-        for choice in choices.split('\n'):
-            final_discr = f'{final_discr}{alphabet[len(alp_ch)]} - {choice}\n'
-            alp_ch.append(alphabet[len(alp_ch)])
+        for num, choice in enumerate(choices.split('\n')[:len(alphabet)]):
+            description = (
+                f'{description}'
+                f'{alphabet[num]} - {choice}\n'
+            )
         
         
         embed = nextcord.Embed(
             title=question,
-            description=final_discr,
+            description=description,
             color=0xffba08
         )
-        if description:
-            embed.add_field(name='Описание',value=description)
+        if sketch:
+            embed.add_field(name='Описание',value=sketch)
         
         message = await interaction.channel.send(embed=embed)
-        db.set(message.id,interaction.user.id)
-        for ch in alp_ch:
-            await message.add_reaction(ch)
+        db.set('polls', message.id, interaction.user.id)
+        
+        for serial, _ in enumerate(choices.split('\n')[:len(alphabet)]):
+            await message.add_reaction(alphabet[serial])
 
 
