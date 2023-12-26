@@ -1,12 +1,10 @@
 import nextcord
 from nextcord.ext import commands
 
-from bot.misc.anprimbot import AnprimBot
-
 class Messages(commands.Cog):
-    bot: AnprimBot
+    bot: commands.Bot
 
-    def __init__(self, bot: AnprimBot) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
     
     @commands.Cog.listener()
@@ -18,7 +16,7 @@ class Messages(commands.Cog):
             await message.delete()
 
 
-def setup(bot: AnprimBot):
+def setup(bot: commands.Bot):
     cog = Messages(bot)
 
     bot.add_cog(cog)
