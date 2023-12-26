@@ -15,3 +15,6 @@ def get(table_name: str, key: int|str) -> any:
 def set(table_name: str, key: int|str, value: any) -> None:
     table = get_table(table_name)
     table[key] = value
+
+def insert(table_name: str, value: any) -> None:
+    table = get_table(table_name)

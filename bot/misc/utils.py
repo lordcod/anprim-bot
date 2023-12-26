@@ -1,3 +1,4 @@
+import jmespath
 from typing import Union
 
 alphabet = [
@@ -11,6 +12,7 @@ alphabet = [
     '⬜',
     '⬛',
 ]
+
 
 class TableDict:
     def __init__(

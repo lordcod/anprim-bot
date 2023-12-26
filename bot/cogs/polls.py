@@ -2,16 +2,26 @@ import nextcord
 from nextcord.ext import commands
 
 from bot.views.view import CreatePoll
+from bot.misc.anprimbot import AnprimBot
 from bot.misc.utils import alphabet
 from bot import db
 
-import os
+
+def is_valid_poll_data(data: dict|None) -> bool:
+    if not data:
+        return False
+    
+    user_id = data.get('user_id')
+    title = data.get('title')
+    options = data.get('options')
+    
+    return user_id and title and options
 
 
 class Polls(commands.Cog):
-    bot: commands.Bot
+    bot: AnprimBot
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: AnprimBot) -> None:
         self.bot = bot
     
         
@@ -24,14 +34,14 @@ class Polls(commands.Cog):
         await interaction.response.send_message("Pong!", ephemeral=True, delete_after=0.05)
 
         poll_data = db.get('polls', message.id)
-        if not poll_data:
+        if not is_valid_poll_data(poll_data):
             return
         
         user_id = poll_data.get('user_id')
         title = poll_data.get('title')
         options = poll_data.get('options')
         
-        if user_id and not interaction.user.id == user_id:
+        if not interaction.user.id == user_id:
             await interaction.response.send_message('Это не ваш опрос',ephemeral=True)
             return
         
@@ -58,7 +68,7 @@ class Polls(commands.Cog):
 
 
 
-def setup(bot: commands.Bot):
+def setup(bot: AnprimBot):
     cog = Polls(bot)
 
     bot.add_cog(cog)
