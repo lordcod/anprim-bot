@@ -83,6 +83,3 @@ def start_bot():
     load_dir("./bot/cogs")
     
     bot.run(token)
-
-if __name__ == "__main__":
-    start_bot()
