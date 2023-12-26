@@ -1,5 +1,7 @@
 import nextcord
 import time
+
+from bot.misc.anprimbot import AnprimBot
 from bot.misc.utils import TableDict,alphabet
 from bot.misc.env import (channel_suggest,channel_suggest_accept,accept_roles)
 from bot import db
@@ -8,7 +10,7 @@ timeout = TableDict(0)
 
 
 class ConfirmModal(nextcord.ui.Modal):
-    def __init__(self,bot,interaction):
+    def __init__(self,bot,interaction: nextcord.Interaction):
         super().__init__(
             "Предложить идею",
             timeout=5 * 60,  # 5 minutes
@@ -55,7 +57,9 @@ class ConfirmModal(nextcord.ui.Modal):
         await channel.send(content=content,embed=embed_accept)
 
 class Confirm(nextcord.ui.View):
-    def __init__(self,bot):
+    bot: AnprimBot
+    
+    def __init__(self,bot: AnprimBot):
         super().__init__(timeout=None)
         self.bot = bot
     
@@ -90,8 +94,11 @@ class Confirm(nextcord.ui.View):
         
         await interaction.message.edit(content=content,embed=embed,view=self)
 
+
 class IdeaModal(nextcord.ui.Modal):
-    def __init__(self,bot):
+    bot: AnprimBot
+    
+    def __init__(self,bot: AnprimBot):
         super().__init__(
             "Предложить идею",
             timeout=5 * 60,  # 5 minutes
@@ -132,7 +139,9 @@ class IdeaModal(nextcord.ui.Modal):
         timeout[interaction.user.id] = time.time()+1800
 
 class IdeaBut(nextcord.ui.View):
-    def __init__(self,bot):
+    bot: AnprimBot
+    
+    def __init__(self,bot: AnprimBot):
         self.bot = bot
         super().__init__(timeout=None)
 
@@ -155,6 +164,7 @@ class IdeaBut(nextcord.ui.View):
             )
             return
         await interaction.response.send_modal(modal=IdeaModal(self.bot))
+
 
 class CreatePoll(nextcord.ui.Modal):
     def __init__(self) -> None:

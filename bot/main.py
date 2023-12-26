@@ -1,14 +1,16 @@
 import nextcord
 from nextcord.ext import commands
 from bot.views.view import (Confirm,IdeaBut)
+from bot.misc.anprimbot import AnprimBot
 from bot.misc.env import token
 import os
 
-bot = commands.Bot(
+
+
+bot = AnprimBot(
     command_prefix='a.',
     intents=nextcord.Intents.all()
 )
-
 
 
 @bot.event
