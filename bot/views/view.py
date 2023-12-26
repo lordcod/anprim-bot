@@ -182,6 +182,8 @@ class CreatePoll(nextcord.ui.Modal):
     
     
     async def callback(self, interaction: nextcord.Interaction):
+        await interaction.response.pong()
+        
         question = self.question.value
         choices = self.choices.value
         sketch = self.description.value
@@ -203,8 +205,15 @@ class CreatePoll(nextcord.ui.Modal):
         if sketch:
             embed.add_field(name='Описание',value=sketch)
         
+        nurtured_data = {
+            'title':question,
+            'sketch':sketch,
+            'user_id':interaction.user.id,
+            'options':choices.split('\n')[:len(alphabet)],
+        } 
+        
         message = await interaction.channel.send(embed=embed)
-        db.set('polls', message.id, interaction.user.id)
+        db.set('polls', message.id, nurtured_data)
         
         for serial, _ in enumerate(choices.split('\n')[:len(alphabet)]):
             await message.add_reaction(alphabet[serial])
