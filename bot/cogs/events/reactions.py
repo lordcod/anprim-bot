@@ -10,16 +10,16 @@ class Reactions(commands.Cog):
     
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: nextcord.Reaction, user: nextcord.User):
-        if user.bot:
+        if user.bot or not reaction.message.author.bot:
             return
-        if not reaction.message.author.bot:
-            return
+
         for react in reaction.message.reactions:
             if react == reaction:
                 continue
-            async for member in react.users():
-                if member == user:
-                    await react.remove(user)
+            
+            react_users = await react.users().flatten()
+            if user in react_users:
+                reaction.remove()
 
 def setup(bot: commands.Bot):
     cog = Reactions(bot)
