@@ -1,7 +1,7 @@
 import nextcord
+from nextcord.ext import commands
 import time
 
-from bot.misc.anprimbot import AnprimBot
 from bot.misc.utils import TableDict,alphabet
 from bot.misc.env import (channel_suggest,channel_suggest_accept,accept_roles)
 from bot import db
@@ -10,7 +10,9 @@ timeout = TableDict(0)
 
 
 class ConfirmModal(nextcord.ui.Modal):
-    def __init__(self,bot,interaction: nextcord.Interaction):
+    bot: commands.Bot
+    
+    def __init__(self, bot, interaction: nextcord.Interaction):
         super().__init__(
             "Предложить идею",
             timeout=5 * 60,  # 5 minutes
@@ -57,9 +59,9 @@ class ConfirmModal(nextcord.ui.Modal):
         await channel.send(content=content,embed=embed_accept)
 
 class Confirm(nextcord.ui.View):
-    bot: AnprimBot
+    bot: commands.Bot
     
-    def __init__(self,bot: AnprimBot):
+    def __init__(self, bot: commands.Bot):
         super().__init__(timeout=None)
         self.bot = bot
     
@@ -96,9 +98,9 @@ class Confirm(nextcord.ui.View):
 
 
 class IdeaModal(nextcord.ui.Modal):
-    bot: AnprimBot
+    bot: commands.Bot
     
-    def __init__(self,bot: AnprimBot):
+    def __init__(self,bot: commands.Bot):
         super().__init__(
             "Предложить идею",
             timeout=5 * 60,  # 5 minutes
@@ -139,9 +141,9 @@ class IdeaModal(nextcord.ui.Modal):
         timeout[interaction.user.id] = time.time()+1800
 
 class IdeaBut(nextcord.ui.View):
-    bot: AnprimBot
+    bot: commands.Bot
     
-    def __init__(self,bot: AnprimBot):
+    def __init__(self,bot: commands.Bot):
         self.bot = bot
         super().__init__(timeout=None)
 
@@ -192,7 +194,7 @@ class CreatePoll(nextcord.ui.Modal):
     
     
     async def callback(self, interaction: nextcord.Interaction):
-        await interaction.response.pong()
+        await interaction.response.defer(ephemeral=True, with_message=False)
         
         question = self.question.value
         choices = self.choices.value
@@ -200,10 +202,14 @@ class CreatePoll(nextcord.ui.Modal):
         
         description = ""
         
+        if 1 >= len(choices.split('\n')):
+            await interaction.followup.send(content="Должно быть больше 1 варианта выбора\nЧтобы указать еще варианты перенесите строку", ephemeral=True, delete_after=5.0)
+            return
+        
         for num, choice in enumerate(choices.split('\n')[:len(alphabet)]):
             description = (
                 f'{description}'
-                f'{alphabet[num]} - {choice}\n'
+                f'{num+1}.`{choice}`({alphabet[num]})\n'
             )
         
         
@@ -215,17 +221,17 @@ class CreatePoll(nextcord.ui.Modal):
         if sketch:
             embed.add_field(name='Описание',value=sketch)
         
+        message = await interaction.channel.send(embed=embed)
+        
+        for serial, _ in enumerate(choices.split('\n')[:len(alphabet)]):
+            await message.add_reaction(alphabet[serial])
+        
         nurtured_data = {
             'title':question,
             'sketch':sketch,
             'user_id':interaction.user.id,
             'options':choices.split('\n')[:len(alphabet)],
         } 
-        
-        message = await interaction.channel.send(embed=embed)
         db.set('polls', message.id, nurtured_data)
-        
-        for serial, _ in enumerate(choices.split('\n')[:len(alphabet)]):
-            await message.add_reaction(alphabet[serial])
 
 

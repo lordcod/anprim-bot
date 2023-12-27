@@ -4,7 +4,7 @@ from bot.views.view import (Confirm,IdeaBut)
 from bot.misc.env import token
 
 import os
-from time import time as tick
+import time
 from datetime import datetime
 
 week = 60 * 60 * 24 * 7
@@ -18,7 +18,7 @@ bot = commands.Bot(
 async def infractions(ctx: commands.Context):
     users_data = {}
     
-    current_time = int(tick())
+    current_time = int(time.time())
     week_ago = current_time-week
     
     dt_current_time = datetime.fromtimestamp(current_time)

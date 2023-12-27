@@ -2,7 +2,6 @@ import nextcord
 from nextcord.ext import commands
 
 from bot.views.view import CreatePoll
-from bot.misc.anprimbot import AnprimBot
 from bot.misc.utils import alphabet
 from bot import db
 
@@ -19,9 +18,9 @@ def is_valid_poll_data(data: dict|None) -> bool:
 
 
 class Polls(commands.Cog):
-    bot: AnprimBot
+    bot: commands.Bot
 
-    def __init__(self, bot: AnprimBot) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
     
         
@@ -31,9 +30,9 @@ class Polls(commands.Cog):
 
     @nextcord.message_command("Test Finish Poll", guild_ids=[1179069504186232852])
     async def finish_poll(self, interaction: nextcord.Interaction, message: nextcord.Message):
-        await interaction.response.send_message("Pong!", ephemeral=True, delete_after=0.05)
+        await interaction.response.defer(ephemeral=True, with_message=False)
 
-        poll_data = db.get('polls', message.id)
+        poll_data: dict = db.get('polls', message.id)
         if not is_valid_poll_data(poll_data):
             return
         
@@ -42,7 +41,7 @@ class Polls(commands.Cog):
         options = poll_data.get('options')
         
         if not interaction.user.id == user_id:
-            await interaction.response.send_message('Это не ваш опрос',ephemeral=True)
+            await interaction.edit_original_message(content="Это не ваш опрос.\nУ вас нет прав завершить данное голование!")
             return
         
         general_count = sum([react.count for react in message.reactions])-len(message.reactions)
@@ -53,7 +52,7 @@ class Polls(commands.Cog):
             percent = (0 if general_count==0 else count//general_count) * 100
             text = (
                 f'{text}'
-                f'{alphabet[num]}{options[num]} - **{percent}%**\n'
+                f'{num+1}.`{options[num]}`({alphabet[num]}) - **{percent}%**\n'
             )
         
         embed = nextcord.Embed(
@@ -65,10 +64,12 @@ class Polls(commands.Cog):
         embed.set_footer(text="Голосование было завершено!")
         
         await message.edit(embed=embed)
+        
+        await interaction.edit_original_message(content="Голосование успешно завершено!")
 
 
 
-def setup(bot: AnprimBot):
+def setup(bot: commands.Bot):
     cog = Polls(bot)
 
     bot.add_cog(cog)
