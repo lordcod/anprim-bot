@@ -25,7 +25,7 @@ class Moderation(commands.Cog):
     
     @commands.command("rules")
     async def command_rules(self, ctx: commands.Context, _rule: Optional[str] = None):
-        if _rule is not None and (rule := re.fullmatch(r"([1-6]).(1?[0-9])", _rule)):
+        if _rule is not None and (rule := re.fullmatch(r"([1-6])\.(1?[0-9])", _rule)):
             title = category_title.get(rule.group(1))
             description = rules.get(rule.group(1)).get(rule.group(2))
             
