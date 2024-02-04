@@ -14,12 +14,13 @@ Coro = TypeVar("Coro", bound=Callable[..., Coroutine[Any, Any, Any]])
 class AnprimBot(commands.Bot):
     def __init__(self) -> None:
         super().__init__(command_prefix='a.', intents=nextcord.Intents.all())
-        self.event
     
     def add_event(self, coro: Coro) -> Coro:
         """
         It works according to the `event` principle
         
+        Exemple
+        -------
         ```
         def __init__(self, bot: AnprimBot):
             self.bot = bot
@@ -28,6 +29,15 @@ class AnprimBot(commands.Bot):
         async def on_ready(self):
             print(f"The bot is registered as {self.bot.user}")
         ```
+        
+        Parametrs
+        ---------
+        coro: Coro - corontine function
+        
+        Raises
+        ------
+        TypeError
+            The coroutine passed is not actually a coroutine.
         """
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("event registered must be a coroutine function")
