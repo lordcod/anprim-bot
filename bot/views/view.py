@@ -6,11 +6,13 @@ from bot.misc.utils import TableDict,alphabet
 from bot.misc.env import (channel_suggest,channel_suggest_accept,accept_roles)
 from bot import db
 
+from bot.misc.anprim_bot import AnprimBot
+
 timeout = TableDict(0)
 
 
 class ConfirmModal(nextcord.ui.Modal):
-    bot: commands.Bot
+    bot: AnprimBot
     
     def __init__(self, bot, interaction: nextcord.Interaction):
         super().__init__(
@@ -59,9 +61,9 @@ class ConfirmModal(nextcord.ui.Modal):
         await channel.send(content=content,embed=embed_accept)
 
 class Confirm(nextcord.ui.View):
-    bot: commands.Bot
+    bot: AnprimBot
     
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: AnprimBot):
         super().__init__(timeout=None)
         self.bot = bot
     
@@ -98,9 +100,9 @@ class Confirm(nextcord.ui.View):
 
 
 class IdeaModal(nextcord.ui.Modal):
-    bot: commands.Bot
+    bot: AnprimBot
     
-    def __init__(self,bot: commands.Bot):
+    def __init__(self,bot: AnprimBot):
         super().__init__(
             "Предложить идею",
             timeout=5 * 60,  # 5 minutes
@@ -141,9 +143,9 @@ class IdeaModal(nextcord.ui.Modal):
         timeout[interaction.user.id] = time.time()+1800
 
 class IdeaBut(nextcord.ui.View):
-    bot: commands.Bot
+    bot: AnprimBot
     
-    def __init__(self,bot: commands.Bot):
+    def __init__(self,bot: AnprimBot):
         self.bot = bot
         super().__init__(timeout=None)
 

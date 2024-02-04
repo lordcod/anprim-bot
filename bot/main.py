@@ -2,6 +2,7 @@ import nextcord
 from nextcord.ext import commands
 from bot.views.view import (Confirm,IdeaBut)
 from bot.misc.env import token
+from bot.misc.anprim_bot import AnprimBot
 
 import os
 import time
@@ -9,10 +10,7 @@ from datetime import datetime
 
 week = 60 * 60 * 24 * 7
 
-bot = commands.Bot(
-    command_prefix='a.',
-    intents=nextcord.Intents.all()
-)
+bot = AnprimBot()
 
 @bot.command()
 async def infractions(ctx: commands.Context):
@@ -51,6 +49,7 @@ async def infractions(ctx: commands.Context):
     embed.set_footer(text=f"Total results: {total_results}")
     await ctx.send(embed=embed)
 
+
 @bot.event
 async def on_ready():
     bot.add_view(Confirm(bot))
@@ -68,6 +67,34 @@ async def on_message(message: nextcord.Message):
     await bot.process_commands(message)
 
 
+@bot.command(name="purge-between")
+@commands.has_permissions(manage_messages=True)
+async def between(ctx: commands.Context, message_start: nextcord.Message, messsage_finish: nextcord.Message = None):
+    if messsage_finish and message_start.channel != messsage_finish.channel:
+        raise commands.CommandError("Channel error")
+    
+    messages = []
+    finder = False
+    minimum_time = int((time.time() - 14 * 24 * 60 * 60) * 1000.0 - 1420070400000) << 22
+    
+    async for message in message_start.channel.history(limit=100):
+        if not messsage_finish:
+            messsage_finish = message
+        
+        if message == messsage_finish:
+            finder = True
+        
+        if finder:
+            messages.append(message)
+        
+        if message == message_start or len(messages) >= 50 or message.id < minimum_time:
+            break
+    
+    await ctx.channel.delete_messages(messages)
+    
+    await ctx.send(f'Deleted {len(messages)} message(s)',delete_after=5.0)
+
+
 
 def load_dir(dirpath: str) -> None:
     for filename in os.listdir(dirpath):
@@ -81,6 +108,6 @@ def load_dir(dirpath: str) -> None:
             load_dir(f'{dirpath}/{filename}')
 
 def start_bot():
-    load_dir("./bot/cogs")
+    # load_dir("./bot/cogs")
     
     bot.run(token)

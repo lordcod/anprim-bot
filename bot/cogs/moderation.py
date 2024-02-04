@@ -2,12 +2,13 @@ import nextcord
 from nextcord.ext import commands
 
 import time
+from bot.misc.anprim_bot import AnprimBot
 from bot.views.view import IdeaBut
 
 class Moderation(commands.Cog):
-    bot: commands.Bot
+    bot: AnprimBot
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot) -> None:
         self.bot = bot
     
     
@@ -81,7 +82,7 @@ class Moderation(commands.Cog):
         await ctx.send(f'Deleted {len(messages)} message(s)',delete_after=5.0)
 
 
-def setup(bot: commands.Bot):
+def setup(bot):
     cog = Moderation(bot)
 
     bot.add_cog(cog)
