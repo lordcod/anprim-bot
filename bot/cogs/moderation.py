@@ -2,8 +2,9 @@ import nextcord
 from nextcord.ext import commands
 
 import time
-from typing import Optional
 import re
+from typing import Optional
+
 from bot.misc.datas import rules, category_title
 from bot.misc.anprim_bot import AnprimBot
 from bot.views.view import IdeaBut
@@ -25,38 +26,39 @@ class Moderation(commands.Cog):
     
     @commands.command("rules")
     async def command_rules(self, ctx: commands.Context, _rule: Optional[str] = None):
+        embeds = []
         if _rule is not None and (rule := re.fullmatch(r"([1-6])\.(1?[0-9])", _rule)):
             title = category_title.get(rule.group(1))
             description = rules.get(rule.group(1)).get(rule.group(2))
             
-            embed = nextcord.Embed(
+            embeds.append(nextcord.Embed(
                 title=title,
                 description=description,
                 color=0xffba08
-            )
-            await ctx.send(embed=embed)
+            ))
         elif _rule is not None and (category := re.fullmatch(r"([1-6])", _rule)):
             description = ""
             for num, rule in rules[category.group(1)].items():
                 description += f"**{num}**. {rule}\n"
             
-            embed = nextcord.Embed(
+            embeds.append(nextcord.Embed(
                 title=category_title.get(category.group(1)),
                 description=description,
                 color=0xffba08
-            )
-            await ctx.send(embed=embed)
+            ))
         else:
-            embeds = []
-            
             for category_id, _rules in rules.items():
                 description = ""
                 for num, rule in _rules.items():
                     description += f"**{num}**. {rule}\n"
                 
-                embeds.append(nextcord.Embed(title=category_title[category_id], description=description, color=0xffba08))
-            
-            await ctx.send(embeds=embeds)
+                embeds.append(nextcord.Embed(
+                    title=category_title[category_id],
+                    description=description, 
+                    color=0xffba08
+                ))
+        
+        await ctx.send(embeds=embeds)
     
     @commands.group(invoke_without_command=True)
     @commands.has_permissions(manage_messages=True)
