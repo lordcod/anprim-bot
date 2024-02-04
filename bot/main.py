@@ -7,8 +7,6 @@ import os
 import time
 from datetime import datetime
 
-week = 60 * 60 * 24 * 7
-
 bot = AnprimBot()
 
 def load_dir(dirpath: str) -> None:
@@ -23,6 +21,6 @@ def load_dir(dirpath: str) -> None:
             load_dir(f'{dirpath}/{filename}')
 
 def start_bot():
-    # load_dir("./bot/cogs")
+    load_dir("./bot/cogs")
     
     bot.run(token)

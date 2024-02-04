@@ -4,14 +4,19 @@ from nextcord.ext import commands
 import asyncio
 import logging
 
+from typing import TypeVar, Callable, Coroutine, Any
+
 _log = logging.getLogger(__name__)
+
+Coro = TypeVar("Coro", bound=Callable[..., Coroutine[Any, Any, Any]])
+
 
 class AnprimBot(commands.Bot):
     def __init__(self) -> None:
         super().__init__(command_prefix='a.', intents=nextcord.Intents.all())
         self.event
     
-    def add_event(self, coro):
+    def add_event(self, coro: Coro) -> Coro:
         """
         It works according to the `event` principle
         
