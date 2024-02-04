@@ -1,15 +1,15 @@
 import nextcord
 from nextcord.ext import commands
 
-class Basic(commands.Cog):
-    bot: commands.Bot
+from bot.misc.anprim_bot import AnprimBot
 
-    def __init__(self, bot: commands.Bot) -> None:
+class Basic(commands.Cog):
+    def __init__(self, bot: AnprimBot) -> None:
         self.bot = bot
     
 
 
-def setup(bot: commands.Bot):
+def setup(bot):
     cog = Basic(bot)
 
     bot.add_cog(cog)

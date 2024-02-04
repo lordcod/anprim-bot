@@ -1,6 +1,7 @@
 import nextcord
 from nextcord.ext import commands
 
+from bot.misc.anprim_bot import AnprimBot
 from bot.views.view import CreatePoll
 from bot.misc.utils import alphabet
 from bot import db
@@ -18,12 +19,9 @@ def is_valid_poll_data(data: dict|None) -> bool:
 
 
 class Polls(commands.Cog):
-    bot: commands.Bot
-
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: AnprimBot) -> None:
         self.bot = bot
     
-        
     @nextcord.slash_command(name="test-poll", guild_ids=[1179069504186232852])
     async def poll(self, interaction: nextcord.Interaction):
         await interaction.response.send_modal(CreatePoll())
@@ -69,7 +67,7 @@ class Polls(commands.Cog):
 
 
 
-def setup(bot: commands.Bot):
+def setup(bot):
     cog = Polls(bot)
 
     bot.add_cog(cog)

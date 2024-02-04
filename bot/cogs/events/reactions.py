@@ -1,11 +1,11 @@
 import nextcord
 from nextcord.ext import commands
 
+from bot.misc.anprim_bot import AnprimBot
+
 
 class Reactions(commands.Cog):
-    bot: commands.Bot
-
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: AnprimBot) -> None:
         self.bot = bot
     
     @commands.Cog.listener()
@@ -21,7 +21,7 @@ class Reactions(commands.Cog):
             if user in react_users:
                 reaction.remove()
 
-def setup(bot: commands.Bot):
+def setup(bot):
     cog = Reactions(bot)
 
     bot.add_cog(cog)

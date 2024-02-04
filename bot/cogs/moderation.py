@@ -2,12 +2,14 @@ import nextcord
 from nextcord.ext import commands
 
 import time
+from typing import Optional
+import re
+from bot.misc.datas import rules, category_title
+from bot.misc.anprim_bot import AnprimBot
 from bot.views.view import IdeaBut
 
 class Moderation(commands.Cog):
-    bot: commands.Bot
-
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: AnprimBot) -> None:
         self.bot = bot
     
     
@@ -20,6 +22,30 @@ class Moderation(commands.Cog):
     @commands.is_owner()
     async def shutdown(self, ctx:commands.Context):
         await self.bot.close()
+    
+    @commands.command("rules")
+    async def command_rules(self, ctx: commands.Context, _rule: str):
+        if rule := re.fullmatch(r"([1-6]).(1?[0-9])", _rule):
+            title = category_title.get(rule.group(1))
+            description = rules.get(rule.group(1)).get(rule.group(2))
+            
+            embed = nextcord.Embed(
+                title=title,
+                description=description,
+                color=0xffba08
+            )
+            await ctx.send(embed=embed)
+        elif category := re.fullmatch(r"([1-6])", _rule):
+            description = ""
+            for num, rule in rules[category.group(1)].items():
+                description += f"**{num}**.{rule}\n"
+            
+            embed = nextcord.Embed(
+                title=category_title.get(category.group(1)),
+                description=description,
+                color=0xffba08
+            )
+            await ctx.send(embed=embed)
     
     @commands.group(invoke_without_command=True)
     @commands.has_permissions(manage_messages=True)
@@ -78,10 +104,10 @@ class Moderation(commands.Cog):
         
         await ctx.channel.delete_messages(messages)
         
-        await ctx.send(f'Deleted {len(messages)} message(s)',delete_after=5.0)
+        await ctx.send(f'Deleted {len(messages)} message(s)', delete_after=5.0)
 
 
-def setup(bot: commands.Bot):
+def setup(bot):
     cog = Moderation(bot)
 
     bot.add_cog(cog)

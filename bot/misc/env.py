@@ -1,6 +1,9 @@
 from os import environ
+from dotenv import load_dotenv
 
-token = environ.get('lordkind_token')#"MTE2Mzc0NzQxOTg2ODExOTA0MA.GA6nMN.oGDmsgTtQX-40ov51airPeziHflOg7Z2_XNSt0"
+load_dotenv()
+
+token = environ.get('lordkind_token')
 
 channel_suggest = 1170031835728859208#1170031835728859208
 channel_suggest_accept = 1172080010706821122
