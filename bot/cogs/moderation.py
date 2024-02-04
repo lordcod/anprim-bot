@@ -6,9 +6,7 @@ from bot.misc.anprim_bot import AnprimBot
 from bot.views.view import IdeaBut
 
 class Moderation(commands.Cog):
-    bot: AnprimBot
-
-    def __init__(self, bot) -> None:
+    def __init__(self, bot: AnprimBot) -> None:
         self.bot = bot
     
     
@@ -21,6 +19,7 @@ class Moderation(commands.Cog):
     @commands.is_owner()
     async def shutdown(self, ctx:commands.Context):
         await self.bot.close()
+    
     
     @commands.group(invoke_without_command=True)
     @commands.has_permissions(manage_messages=True)
@@ -79,7 +78,7 @@ class Moderation(commands.Cog):
         
         await ctx.channel.delete_messages(messages)
         
-        await ctx.send(f'Deleted {len(messages)} message(s)',delete_after=5.0)
+        await ctx.send(f'Deleted {len(messages)} message(s)', delete_after=5.0)
 
 
 def setup(bot):

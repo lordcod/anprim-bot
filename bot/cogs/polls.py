@@ -19,9 +19,7 @@ def is_valid_poll_data(data: dict|None) -> bool:
 
 
 class Polls(commands.Cog):
-    bot: AnprimBot
-
-    def __init__(self, bot) -> None:
+    def __init__(self, bot: AnprimBot) -> None:
         self.bot = bot
     
     @nextcord.slash_command(name="test-poll", guild_ids=[1179069504186232852])

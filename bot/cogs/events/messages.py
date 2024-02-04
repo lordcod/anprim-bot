@@ -4,9 +4,7 @@ from nextcord.ext import commands
 from bot.misc.anprim_bot import AnprimBot
 
 class Messages(commands.Cog):
-    bot: AnprimBot
-
-    def __init__(self, bot) -> None:
+    def __init__(self, bot: AnprimBot) -> None:
         self.bot = bot
     
     @commands.Cog.listener()

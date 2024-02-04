@@ -1,6 +1,5 @@
 import nextcord
 from nextcord.ext import commands
-from bot.views.view import (Confirm,IdeaBut)
 from bot.misc.env import token
 from bot.misc.anprim_bot import AnprimBot
 
@@ -12,93 +11,9 @@ week = 60 * 60 * 24 * 7
 
 bot = AnprimBot()
 
-@bot.command()
-async def infractions(ctx: commands.Context):
-    users_data = {}
-    
-    current_time = int(time.time())
-    week_ago = current_time-week
-    
-    dt_current_time = datetime.fromtimestamp(current_time)
-    dt_week_ago = datetime.fromtimestamp(week_ago)
-    
-    async for message in ctx.channel.history(limit=250, after=dt_week_ago, before=dt_current_time):
-        if message.author.id not in users_data:
-            users_data[message.author.id] = []
-        
-        users_data[message.author.id].append(message)
-    
-    sorted(users_data.items(), key=lambda item: len(item[1]), reverse=True)
-    
-    total_results = 0
-    description = ""
-    for user_id, messages in users_data.items():
-        total_results += len(messages)
-        
-        user = ctx.guild.get_member(user_id)
-        description = (
-            f"{description}"
-            f"**{user.display_name}** - {len(messages)}\n"
-        )
-    
-    embed = nextcord.Embed(
-        title="Reports for week",
-        description=description,
-        color=0xffba08,
-    )
-    embed.set_footer(text=f"Total results: {total_results}")
-    await ctx.send(embed=embed)
-
-
-@bot.event
-async def on_ready():
-    bot.add_view(Confirm(bot))
-    bot.add_view(IdeaBut(bot))
-    print(f"The bot is registered as {bot.user}")
-
-@bot.event
-async def on_message(message: nextcord.Message):
-    if message.author.bot:
-        return
-    
-    if message.channel.id == 1169329230195196014:
-        await message.delete()
-    
-    await bot.process_commands(message)
-
-
-@bot.command(name="purge-between")
-@commands.has_permissions(manage_messages=True)
-async def between(ctx: commands.Context, message_start: nextcord.Message, messsage_finish: nextcord.Message = None):
-    if messsage_finish and message_start.channel != messsage_finish.channel:
-        raise commands.CommandError("Channel error")
-    
-    messages = []
-    finder = False
-    minimum_time = int((time.time() - 14 * 24 * 60 * 60) * 1000.0 - 1420070400000) << 22
-    
-    async for message in message_start.channel.history(limit=100):
-        if not messsage_finish:
-            messsage_finish = message
-        
-        if message == messsage_finish:
-            finder = True
-        
-        if finder:
-            messages.append(message)
-        
-        if message == message_start or len(messages) >= 50 or message.id < minimum_time:
-            break
-    
-    await ctx.channel.delete_messages(messages)
-    
-    await ctx.send(f'Deleted {len(messages)} message(s)',delete_after=5.0)
-
-
-
 def load_dir(dirpath: str) -> None:
     for filename in os.listdir(dirpath):
-        if os.path.isfile(f'{dirpath}/{filename}') and filename.endswith(".py") and not filename.startswith("__"):
+        if os.path.isfile(f'{dirpath}/{filename}') and filename.endswith(".py"):
             fmp = filename[:-3]
             supdirpath = dirpath[2:].split("/")
             findirpatch = '.'.join(supdirpath)
