@@ -22,11 +22,11 @@ class Polls(commands.Cog):
     def __init__(self, bot: AnprimBot) -> None:
         self.bot = bot
 
-    @nextcord.slash_command(name="test-poll", guild_ids=[1179069504186232852])
+    @nextcord.slash_command(name="poll", guild_ids=[1179069504186232852])
     async def poll(self, interaction: nextcord.Interaction):
         await interaction.response.send_modal(CreatePoll())
 
-    @nextcord.message_command("Test Finish Poll", guild_ids=[1179069504186232852])
+    @nextcord.message_command("Finish Poll", guild_ids=[1179069504186232852])
     async def finish_poll(self, interaction: nextcord.Interaction, message: nextcord.Message):
         await interaction.response.defer(ephemeral=True, with_message=False)
 

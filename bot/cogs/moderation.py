@@ -1,6 +1,7 @@
 import nextcord
 from nextcord.ext import commands
 
+import asyncio
 import time
 import re
 from typing import Optional
@@ -27,26 +28,7 @@ class Moderation(commands.Cog):
     @commands.command("rules")
     async def command_rules(self, ctx: commands.Context, _rule: Optional[str] = None):
         embeds = []
-        if _rule is not None and (rule := re.fullmatch(r"([1-6])\.(1?[0-9])", _rule)):
-            title = category_title.get(rule.group(1))
-            description = rules.get(rule.group(1)).get(rule.group(2))
-
-            embeds.append(nextcord.Embed(
-                title=title,
-                description=description,
-                color=0xffba08
-            ))
-        elif _rule is not None and (category := re.fullmatch(r"([1-6])", _rule)):
-            description = ""
-            for num, rule in rules[category.group(1)].items():
-                description += f"**{num}**. {rule}\n"
-
-            embeds.append(nextcord.Embed(
-                title=category_title.get(category.group(1)),
-                description=description,
-                color=0xffba08
-            ))
-        else:
+        if _rule is None:
             for category_id, _rules in rules.items():
                 description = ""
                 for num, rule in _rules.items():
@@ -57,6 +39,25 @@ class Moderation(commands.Cog):
                     description=description,
                     color=0xffba08
                 ))
+        elif rule := re.fullmatch(r"([1-6])\.(1?[0-9])", _rule):
+            title = category_title.get(rule.group(1))
+            description = rules.get(rule.group(1)).get(rule.group(2))
+
+            embeds.append(nextcord.Embed(
+                title=title,
+                description=description,
+                color=0xffba08
+            ))
+        elif category := re.fullmatch(r"([1-6])", _rule):
+            description = ""
+            for num, rule in rules[category.group(1)].items():
+                description += f"**{num}**. {rule}\n"
+
+            embeds.append(nextcord.Embed(
+                title=category_title.get(category.group(1)),
+                description=description,
+                color=0xffba08
+            ))
 
         await ctx.send(embeds=embeds)
 

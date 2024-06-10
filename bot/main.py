@@ -1,11 +1,7 @@
-import nextcord
-from nextcord.ext import commands
 from bot.misc.env import token
 from bot.misc.anprim_bot import AnprimBot
 
 import os
-import time
-from datetime import datetime
 
 bot = AnprimBot()
 

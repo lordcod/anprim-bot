@@ -19,7 +19,7 @@ class Reactions(commands.Cog):
 
             react_users = await react.users().flatten()
             if user in react_users:
-                reaction.remove()
+                await reaction.remove(user)
 
 
 def setup(bot):
