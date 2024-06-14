@@ -9,6 +9,7 @@ from typing import Optional
 from bot.misc.datas import rules, category_title
 from bot.misc.anprim_bot import AnprimBot
 from bot.views.view import IdeaBut
+from bot.views.choiser import ChoiseServerView
 
 
 class Moderation(commands.Cog):
@@ -16,9 +17,25 @@ class Moderation(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    async def button_choise(self, ctx: commands.Context):
+        await ctx.message.delete()
+        await ctx.send('Выберите сервер!', view=ChoiseServerView())
+
+    @commands.command()
     async def button_suggest(self, ctx: commands.Context):
         await ctx.message.delete()
         await ctx.send('Предложи свою идею для проекта!', view=IdeaBut(self.bot))
+
+    @commands.command()
+    @commands.is_owner()
+    async def sync_cat(self, ctx: commands.Context):
+        categoryes = [1249384970947006564, 1250665070141247619]
+        tasks = []
+        for cat in categoryes:
+            cat_ch: nextcord.CategoryChannel = self.bot.get_channel(cat)
+            for channel in cat_ch.channels:
+                tasks.append(channel.edit(sync_permissions=True))
+        await asyncio.gather(*tasks)
 
     @commands.command()
     @commands.is_owner()

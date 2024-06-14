@@ -142,8 +142,8 @@ class IdeaModal(nextcord.ui.Modal):
         embed.add_field(name='Идея:', value=idea)
 
         mes = await channel.send(content=interaction.user.mention, embed=embed, view=Confirm(self.bot))
-        await mes.add_reaction("<a:tickmark:1170029771040759969>")
-        await mes.add_reaction("<a:cross:1170029921314279544>")
+        await mes.add_reaction("✅")
+        await mes.add_reaction("❌")
         await mes.create_thread(name=f"Обсуждение идеи от {name}")
 
         timeout[interaction.user.id] = time.time()+1800
